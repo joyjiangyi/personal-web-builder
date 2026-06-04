@@ -1,8 +1,10 @@
 # personal-web-builder
 
-A Claude Code skill that guides anyone through building a cinematic personal website from scratch — portfolio, job search, or personal brand.
+A Claude Code skill that guides anyone through building a website from scratch — personal portfolio, brand site, product landing page, or event page.
 
-**Full flow: interview → blueprint → build → AI video prompts → local preview.**
+**Every website comes out different.** The skill starts by deeply understanding what you want to put on the site and who it's for, then designs the structure and style around your content — not the other way around.
+
+**Full flow: deep requirements chat → content checklist → blueprint → build → AI video prompts → local preview.**
 
 ---
 
@@ -18,26 +20,26 @@ That's it. No path setup. No config files.
 
 ## Usage
 
-Just tell Claude you want a personal website:
+Just tell Claude what you want to build:
 
-> "帮我做个人网站"
-> "搭一个作品集"
-> "build my personal portfolio"
+> "帮我做个人网站" / "做个品牌官网" / "搭个产品落地页"
+> "build my portfolio / brand site / landing page"
 
 Claude will:
 
-1. **Ask 5 questions** — name, purpose, audience, style, color preference (one at a time)
-2. **Output a blueprint** — page structure + copy drafts, tailored to your profession
-3. **Build the website** — single-file HTML with cinematic scroll-scrubbing video background
-4. **Give you AI video prompts** — 3 options: AI-generated (Runway/Kling/Pika), Pexels free stock, or keep the default
-5. **Walk you through local preview** — `npx serve` + 5-item checklist
+1. **Have a real conversation** — ask what content you want, who it's for, what format each piece is (video link? image? text?)
+2. **Confirm a content checklist** — before designing anything
+3. **Output a custom blueprint** — page structure, copy drafts, and a visual style derived from *your* content
+4. **Build the website** — single-file HTML, styled uniquely for you
+5. **Give you AI video prompts** — matched to your style (if you want a video background)
+6. **Walk you through local preview** — `npx serve` + checklist
 
 **Output:**
 ```
 your-project/
 ├── index.html          ← full website, all CSS/JS inline
 └── assets/
-    ├── video/          ← background video (default: Grand Budapest curtain)
+    ├── video/          ← background video (yours to provide)
     └── img/            ← your photos and images
 ```
 
@@ -45,20 +47,19 @@ your-project/
 
 ## What you get
 
-- Cinematic scroll-scrubbing video background (GSAP ScrollTrigger)
-- Smooth scroll snap between sections
-- Dark theme with warm gold accents (`#0f0e0d` bg · `#c9a84c` gold · `#f0e8d8` cream)
-- Cormorant Garamond + Inter typography
+- A website designed around **your** content — not a template
+- Structure and style derived from what you actually want to show
+- Scroll-scrubbing video background (optional, GSAP ScrollTrigger)
+- Typography and color matched to your brand/personality
 - Mobile-responsive layout
-- Smart page recommendations based on your profession:
+- Works for all site types:
 
-| Profession | Extra modules |
-|-----------|--------------|
-| Film / Creative | Horizontal scroll poster reel |
-| Developer / PM | Products & open-source projects |
-| Marketing / Ops | Campaign results & data highlights |
-| Designer | Visual portfolio (large image grid) |
-| Content creator | Channel stats & content showcase |
+| Site type | Examples |
+|-----------|----------|
+| Personal portfolio | Designer, filmmaker, developer, marketer |
+| Brand / company site | Studio, agency, small business |
+| Product landing page | App, SaaS, physical product |
+| Event / campaign page | Launch, festival, conference |
 
 ---
 
