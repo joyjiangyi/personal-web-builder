@@ -74,7 +74,7 @@ npx serve .
 
 ## Replace the default video
 
-The skill ships with a Grand Budapest Hotel curtain video as placeholder. To swap it:
+The skill uses a dark cinematic placeholder. To swap in your own video:
 
 ```bash
 # Step 1: Re-encode your video for scrubbing (required)
@@ -94,4 +94,4 @@ Local version only for now. GitHub Pages + custom domain deployment guide coming
 
 ## Inspiration
 
-Built from the real process of creating [jiojiojoy.com](https://jiojiojoy.com) — 7 Claude Code sessions, 9 days, every decision logged.
+Born from a real 9-day build process — 7 Claude Code sessions, every decision logged.
