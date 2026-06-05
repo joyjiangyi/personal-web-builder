@@ -226,6 +226,76 @@ z-20  header（如有）
 z-50  loading 屏（首屏覆盖，视频加载完后淡出）
 ```
 
+### 无视频时的 CSS 动态背景方案
+
+**用户不要视频背景时，不要裸奔纯色。** 根据风格自动选用对应的 CSS 动态背景，保持沉浸感：
+
+| 风格 | CSS 方案 | 效果描述 |
+|------|---------|---------|
+| 电影感 / Editorial | 颗粒噪点 + 暗色渐变 | 胶片质感底纹，静止但有呼吸感 |
+| 海洋 / 奇幻 | `.caustics` 水波光动画 | 缓慢流动的水底光斑 |
+| 科技感 | CSS 网格线 + 扫光动画 | 深色网格，光线缓慢扫过 |
+| 温暖 / 自然 | 柔光 blob 渐变动画 | 粉/橙/黄色光晕缓慢漂移 |
+| 极简 | 纯色 + 细微纸质纹理 | 无动画，但有触感 |
+| 创意 / IP | 彩色 blob 漂移动画 | 品牌色光晕随机漂浮 |
+
+**彩色 blob 漂移（适合创意/IP/温暖风格）：**
+```css
+.bg-blobs {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+}
+.blob-item {
+  position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.35;
+  animation: blobdrift var(--duration, 12s) ease-in-out infinite alternate;
+}
+@keyframes blobdrift {
+  0%   { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(var(--tx, 40px), var(--ty, -30px)) scale(1.1); }
+  100% { transform: translate(var(--tx2, -20px), var(--ty2, 50px)) scale(0.95); }
+}
+```
+用法（颜色换成品牌色）：
+```html
+<div class="bg-blobs">
+  <div class="blob-item" style="width:500px;height:500px;top:-100px;left:-100px;background:#FFE8EE;--duration:14s;--tx:60px;--ty:-40px;--tx2:-30px;--ty2:80px;"></div>
+  <div class="blob-item" style="width:400px;height:400px;bottom:-80px;right:-80px;background:#FFB3C6;--duration:10s;--tx:-50px;--ty:30px;--tx2:40px;--ty2:-60px;"></div>
+</div>
+```
+
+**科技感网格扫光：**
+```css
+.tech-grid {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+.tech-scan {
+  position: fixed; top: 0; left: -100%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(99,179,255,0.04), transparent);
+  animation: scan 8s linear infinite;
+  z-index: 0; pointer-events: none;
+}
+@keyframes scan { to { left: 150%; } }
+```
+
+**颗粒噪点（电影感必备）：**
+```css
+.grain {
+  position: fixed; inset: -50%; z-index: 0; pointer-events: none;
+  width: 200%; height: 200%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  animation: grain 0.5s steps(2) infinite;
+}
+@keyframes grain {
+  0%,100% { transform: translate(0,0); }
+  25%      { transform: translate(-1%,1%); }
+  50%      { transform: translate(1%,-1%); }
+  75%      { transform: translate(-1%,-1%); }
+}
+```
+
 ### Signature CSS — 按风格启用
 
 不要所有人都用同一套 CSS。根据用户选的风格，启用对应的 Signature CSS：
