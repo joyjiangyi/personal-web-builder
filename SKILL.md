@@ -15,14 +15,13 @@ description: 帮助用户从零搭建网站，包括个人网站、品牌官网�
 Phase 1 深度需求沟通
 → Phase 2 内容清单确认
 → Phase 3 蓝图 + 风格确认
-→ Phase 4 网页搭建（视频位置先用 CSS 动态背景占位）
-→ Phase 5 本地验收（用户确认网页 OK）
-→ Phase 6 视频升级（可选：AI 视频提示词 + 替换流程）
+→ Phase 4 网页搭建（视频 scrub 结构已内置，CSS 动画为视频到位前的占位）
+→ Phase 5 本地验收 + 一镜到底 AI 提示词（验收 OK 后输出，用户自行生成视频替换）
 ```
 
 **铁律：蓝图没有用户确认，不写一行代码。**
 
-**顺序逻辑：先让用户看到跑起来的网页，再引导视频升级。不要在没看到成果前让用户去做复杂的视频生成任务。**
+**核心架构原则：视频滚动驱动（scroll scrub）是这个网站的骨架，不是可选装饰。每个网站都按「有视频」的结构生成。没有视频前，CSS 动态背景是占位；用户把 `hero.mp4` 放到同一文件夹，刷新即生效，零改代码。**
 
 ---
 
@@ -223,9 +222,18 @@ z-20  header（如有）
 z-50  loading 屏（首屏覆盖，视频加载完后淡出）
 ```
 
-### 无视频时的 CSS 动态背景方案
+### 视频结构（必须内置，照写）
 
-**用户不要视频背景时，不要裸奔纯色。** 根据风格自动选用对应的 CSS 动态背景，保持沉浸感：
+**每个网站都内置视频背景结构。** 没有视频文件时，`<video>` 元素 `src` 为空，JS 的 `!video.duration` guard 使 scrub 静默，CSS 动态背景作为视觉占位。用户把 `hero.mp4` 放进来，刷新即生效。
+
+> 视频文件命名统一为 `hero.mp4`，和 `index.html` 放在同一目录。用户如有 `.mov` 文件，提醒先转码：
+> ```bash
+> ffmpeg -i input.mov -c:v libx264 -crf 22 -movflags +faststart -pix_fmt yuv420p hero.mp4
+> ```
+
+### CSS 动态背景（视频到位前的占位）
+
+**视频放好之前不裸奔纯色。** 根据风格选用对应动态背景，放在 `z-0` 与 `#video-bg` 同层（视频加载后，视频盖在上面，动态背景自然隐入背景）：
 
 | 风格 | CSS 方案 | 效果描述 |
 |------|---------|---------|
@@ -512,7 +520,7 @@ document.querySelectorAll('[data-reveal]').forEach((el) => revealObserver.observ
 
 ---
 
-## Phase 5 — 本地验收
+## Phase 5 — 本地验收 + 一镜到底提示词
 
 用户先把网页跑起来，确认一切 OK。
 
@@ -528,69 +536,64 @@ npx serve .
 - [ ] Chrome DevTools 手机模拟（375px）布局正常
 - [ ] 所有链接 / 按钮点击跳转正确
 
-### 验收通过后，主动引出视频升级
+### 验收通过后，立刻输出一镜到底 AI 视频提示词
 
-验收 OK 后说：
+验收 OK 后，**不用等用户问**，直接输出：
 
-> "网站本地跑起来了 🎬
+> "网站跑起来了。现在的背景是 CSS 动画占位。
 >
-> 现在的背景是 CSS 动画占位。要不要升级成**滚动驱动的视频背景**？效果是：页面往下滚，背景视频同步往前播，有很强的沉浸感。
->
-> 我帮你出 AI 视频提示词，你去 Kling / Runway 生成一段，替换进来就好。要做吗？"
+> 下面是给你量身定制的 AI 视频提示词，用 Kling 或 Runway 生成后，命名为 `hero.mp4`，放到和 `index.html` 同一个文件夹，刷新就生效——"
 
-- 用户说**要** → 进入 Phase 6
-- 用户说**不用** → 流程结束，提示 Part 2 上线部署
+然后输出**专属于这个用户网站**的一镜到底提示词（见下方生成规则）。
 
 ---
 
-## Phase 6 — 视频升级（可选）
+### 一镜到底 AI 视频提示词生成规则
 
-### Step 1：给出 AI 视频提示词
+**核心要求：** 一镜到底（single continuous shot），无剪切，适合滚动驱动 scrub。视频是背景，不是主角——场景要有深度感、运动感，但不能抢走文字焦点。
 
-根据网站风格，输出对应提示词：
-
-**推荐工具：** Kling（国内，质量好）/ Runway Gen-3 / Pika Labs
-
-**通用结构：**
+**提示词结构：**
 ```
-[场景描述], [灯光风格], [摄影机运动], [色调], cinematic, 4K, slow motion, no text, no people
+[一镜到底场景], [摄影机运动方式], [灯光/氛围], [色调], cinematic, 4K, slow motion, no text, no people, seamless loop
 ```
 
-| 风格 | 提示词 |
-|------|--------|
-| 电影 / 戏剧感 | `Empty film set with dramatic spotlight, camera slowly pushing in, dark atmospheric, cinematic, 4K` |
-| 科技感 | `Abstract glowing data streams flowing in dark space, blue and purple light, slow motion, 4K` |
-| 极简 | `Minimal white studio, soft light shifting slowly, subtle shadows, clean, 4K, no people` |
-| 海洋 / 奇幻 | `Underwater light caustics, deep ocean blue, slow weightless drift, cinematic, 4K` |
-| 温暖 / 自然 | `Golden hour sunlight filtering through leaves, gentle breeze, warm tones, slow motion, 4K` |
-| 城市 / 商务 | `Modern city skyline at dusk, slow aerial push-in, warm ambient light, cinematic, 4K` |
-| 创意 / IP | `Soft pastel light orbs floating in dark space, dreamy warm tones, slow motion, 4K, no people` |
+**摄影机运动必须选一种（对应 scrub 时的纵深感）：**
+- 极缓慢推进（slow push-in）— 最安全，适合所有风格
+- 缓慢下降俯冲（slow aerial descent）— 适合城市/自然
+- 水下缓慢上浮（slow ascent underwater）— 适合海洋/奇幻
+- 从黑暗到光（darkness to light, slow reveal）— 适合电影感
+- 空间/星云缓慢穿越（slow drift through space）— 适合科技感
 
-也可用 Pexels 免费素材（保底）：搜索 `cinematic slow motion` / `atmospheric dark`，筛选 10-30 秒、1080p 以上、横屏。
+**按用户风格 + 内容定制场景（不用泛用模板）：**
 
-### Step 2：用户生成视频后，转码替换
+从 Phase 1 沟通中提取「核心张力」，把它翻译成场景：
 
-```bash
-# .mov 转 .mp4（如果是 .mov 文件）
-ffmpeg -i input.mov -c:v libx264 -crf 22 -movflags +faststart -pix_fmt yuv420p assets/video/bg.mp4
+| 用户身份/张力 | 推荐场景方向 |
+|-------------|------------|
+| 影视/创意人 | Empty film studio, dramatic raking light, camera slowly pushing through | 
+| AI/工程师 | Abstract neural network light streams, deep space, slow drift |
+| 设计师 | Negative space, soft diffused light shifting across minimal surface |
+| 摄影师 | Film grain texture, golden hour light slowly shifting, empty landscape |
+| 海洋/自然 | Underwater caustics, deep blue, slow weightless ascent |
+| 奢华/高端 | Dark marble surface, single spotlight slowly revealing, luxury |
+| 千禧/Y2K | Retro chrome surface, holographic light refractions, slow zoom |
 
-# 已有 .mp4 直接加 faststart
-ffmpeg -i input.mp4 -movflags +faststart -c copy assets/video/bg.mp4
+**输出格式：**
+
 ```
+🎬 一镜到底视频提示词（Kling / Runway Gen-3）
 
-用户转码完告诉 Claude 文件名，Claude 更新 HTML 里的 `<source src>` 路径，并把 CSS 动态背景替换成关键代码块 1 的视频 scrub 代码。
+[英文提示词，100-150字]
 
-### Step 3：验收视频效果
+---
+生成建议：
+- 时长：15-30 秒
+- 分辨率：1920×1080 或以上，横屏
+- 如果是 .mov 文件，先转码：ffmpeg -i input.mov -c:v libx264 -crf 22 -movflags +faststart -pix_fmt yuv420p hero.mp4
+- 转码后命名为 hero.mp4，放到 index.html 同一文件夹，刷新即生效
 
-```bash
-npx serve .
+备选免费素材（Pexels）：搜索 "[2-3个关键词]"，筛选 15s+、1080p、横屏
 ```
-
-- [ ] loading 屏正常淡出
-- [ ] 滚动页面，视频随进度播放，不卡帧，不跳帧
-
-完成后说：
-> "视频替换完成 🎬 下一步是上线部署（GitHub Pages + 自定义域名），那是 Part 2 的内容。"
 
 ---
 
@@ -599,10 +602,12 @@ npx serve .
 1. **先聊需求再做设计** — 内容决定结构，结构决定风格，不反过来
 2. **每个网站都应该不一样** — 风格从用户的内容和品牌中生长出来，不套模板
 3. **张力驱动文案** — Hero 文案找对仗张力，不写简历句
-4. **内容形式要问清楚** — 视频是链接还是文件？作品是图片还是跳转？
-5. **照写关键代码块** — 视频加载/scrub/GSAP reveal 不要自己实现
-6. **截图先行** — 每次改完主动截图，不等用户要
-7. **限制修改范围** — 每次明说只改哪个 section，防止误改
+4. **内容形式要问清楚** — 作品是图片还是跳转？联系方式是邮箱还是表单？
+5. **视频骨架始终内置** — 照写关键代码块 1，不自己实现 scrub / loading
+6. **GSAP 动效照写** — ScrollTrigger 时序容易写错，不要自己实现
+7. **截图先行** — 每次改完主动截图，不等用户要
+8. **限制修改范围** — 每次明说只改哪个 section，CSS 用具体父选择器
+9. **验收后必出提示词** — 验收 OK 就立刻给一镜到底提示词，不需要用户问
 
 ---
 
