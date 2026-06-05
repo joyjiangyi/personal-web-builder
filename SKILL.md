@@ -12,10 +12,17 @@ description: 帮助用户从零搭建网站，包括个人网站、品牌官网�
 ## 整体流程
 
 ```
-Phase 1 深度需求沟通 → Phase 2 内容清单确认 → Phase 3 蓝图+风格确认 → Phase 4 网页搭建 → Phase 5 AI视频 → Phase 6 本地收尾
+Phase 1 深度需求沟通
+→ Phase 2 内容清单确认
+→ Phase 3 蓝图 + 风格确认
+→ Phase 4 网页搭建（视频位置先用 CSS 动态背景占位）
+→ Phase 5 本地验收（用户确认网页 OK）
+→ Phase 6 视频升级（可选：AI 视频提示词 + 替换流程）
 ```
 
 **铁律：蓝图没有用户确认，不写一行代码。**
+
+**顺序逻辑：先让用户看到跑起来的网页，再引导视频升级。不要在没看到成果前让用户去做复杂的视频生成任务。**
 
 ---
 
@@ -94,16 +101,6 @@ Phase 1 深度需求沟通 → Phase 2 内容清单确认 → Phase 3 蓝图+风
 > 如果没有，用几个关键词描述你想要的感觉：
 > 🎬 电影感 · ◻️ 极简 · 🎨 创意 · 💻 科技感 · 🌿 温暖 · 🖋 编辑杂志感 · 💎 奢华高端 · 🎮 游戏感
 
-**⑥ 视频背景**
-> **你希望网站有一个会随滚动动起来的视频背景吗？**（首屏背景会随鼠标滚动播放，有很强的沉浸感）
-> A · 要——我来提供视频，或者用 AI 生成
-> B · 不要——纯色 / 渐变背景就好
-> C · 不确定，你来推荐
-
-**处理规则：**
-- 用户选 A：记录下来，Phase 5 给出 AI 视频提示词 + 替换流程
-- 用户选 B：跳过 Phase 5，直接用纯色或渐变背景
-- 用户选 C：根据网站类型判断——氛围感强的（电影感 / 活动页 / 创意人）推荐加，内容密度高的（品牌官网 / 产品落地页）推荐不加
 
 ---
 
@@ -515,15 +512,44 @@ document.querySelectorAll('[data-reveal]').forEach((el) => revealObserver.observ
 
 ---
 
-## Phase 5 — AI 视频提示词包
+## Phase 5 — 本地验收
 
-**只在用户需要视频背景时进入此阶段。** 不需要视频则直接跳 Phase 6。
+用户先把网页跑起来，确认一切 OK。
 
-根据用户风格偏好，提供三套方案：
+```bash
+npx serve .
+# 打开 http://localhost:3000
+```
 
-### 方案 A — AI 生成视频
+### 验收清单
 
-**推荐工具：** Runway Gen-3 / Kling / Pika Labs
+- [ ] 页面正常加载，CSS 动态背景有动画效果
+- [ ] 所有 section 内容显示正确，无空白
+- [ ] Chrome DevTools 手机模拟（375px）布局正常
+- [ ] 所有链接 / 按钮点击跳转正确
+
+### 验收通过后，主动引出视频升级
+
+验收 OK 后说：
+
+> "网站本地跑起来了 🎬
+>
+> 现在的背景是 CSS 动画占位。要不要升级成**滚动驱动的视频背景**？效果是：页面往下滚，背景视频同步往前播，有很强的沉浸感。
+>
+> 我帮你出 AI 视频提示词，你去 Kling / Runway 生成一段，替换进来就好。要做吗？"
+
+- 用户说**要** → 进入 Phase 6
+- 用户说**不用** → 流程结束，提示 Part 2 上线部署
+
+---
+
+## Phase 6 — 视频升级（可选）
+
+### Step 1：给出 AI 视频提示词
+
+根据网站风格，输出对应提示词：
+
+**推荐工具：** Kling（国内，质量好）/ Runway Gen-3 / Pika Labs
 
 **通用结构：**
 ```
@@ -538,44 +564,33 @@ document.querySelectorAll('[data-reveal]').forEach((el) => revealObserver.observ
 | 海洋 / 奇幻 | `Underwater light caustics, deep ocean blue, slow weightless drift, cinematic, 4K` |
 | 温暖 / 自然 | `Golden hour sunlight filtering through leaves, gentle breeze, warm tones, slow motion, 4K` |
 | 城市 / 商务 | `Modern city skyline at dusk, slow aerial push-in, warm ambient light, cinematic, 4K` |
-| 复古千禧 | `Retro CRT screen glow, vintage electronics, soft light, Y2K aesthetic, slow motion, 4K` |
+| 创意 / IP | `Soft pastel light orbs floating in dark space, dreamy warm tones, slow motion, 4K, no people` |
 
-### 方案 B — Pexels 免费素材（推荐保底）
+也可用 Pexels 免费素材（保底）：搜索 `cinematic slow motion` / `atmospheric dark`，筛选 10-30 秒、1080p 以上、横屏。
 
-搜索关键词：`cinematic slow motion` / `atmospheric dark` / `minimal abstract`
-
-筛选标准：时长 10-30 秒、1080p 以上、无人物特写、横屏 16:9
-
-### 方案 C — 跳过视频
-
-暂时跳过，保留纯色或渐变背景。
-
-### 视频处理命令（有视频必须执行）
+### Step 2：用户生成视频后，转码替换
 
 ```bash
-# .mov 转 .mp4
-ffmpeg -i input.mov -c:v libx264 -crf 22 -movflags +faststart -pix_fmt yuv420p output.mp4
+# .mov 转 .mp4（如果是 .mov 文件）
+ffmpeg -i input.mov -c:v libx264 -crf 22 -movflags +faststart -pix_fmt yuv420p assets/video/bg.mp4
 
-# 已有 .mp4 直接加 faststart（否则 scrub 失效）
-ffmpeg -i input.mp4 -movflags +faststart -c copy output.mp4
+# 已有 .mp4 直接加 faststart
+ffmpeg -i input.mp4 -movflags +faststart -c copy assets/video/bg.mp4
 ```
 
----
+用户转码完告诉 Claude 文件名，Claude 更新 HTML 里的 `<source src>` 路径，并把 CSS 动态背景替换成关键代码块 1 的视频 scrub 代码。
 
-## Phase 6 — 本地预览收尾
+### Step 3：验收视频效果
 
-### 本地验收清单
+```bash
+npx serve .
+```
 
-- [ ] `npx serve .` 启动后，浏览器可以访问 `http://localhost:3000`
-- [ ] loading 屏正常淡出，不卡死
-- [ ] 有视频：滚动时视频随进度播放，不卡帧，不跳帧
-- [ ] 所有 section 内容正常显示，无空白区域
-- [ ] Chrome DevTools 手机模拟（375px 宽度）布局正常
-- [ ] 所有链接 / 按钮点击跳转正确
+- [ ] loading 屏正常淡出
+- [ ] 滚动页面，视频随进度播放，不卡帧，不跳帧
 
-### 收尾提示
-
-> "本地版本完成 🎬 你的网站已经可以在本地运行了。下一步是把它发布到网上（GitHub Pages + 自定义域名），那是 Part 2 的内容。"
+完成后说：
+> "视频替换完成 🎬 下一步是上线部署（GitHub Pages + 自定义域名），那是 Part 2 的内容。"
 
 ---
 
